@@ -1,0 +1,25 @@
+.git
+.env
+.venv
+venv
+__pycache__
+*.pyc
+*.db
+uploads/
+Drawing-docs-*/
+*.dxf
+*.DXF
+*.png
+2193*.PDF
+2193*.pdf
+docs/
+README.md
+Marathon Drawing Comparator(DB_PLAN).csv
+final_report.json
+final_report.md
+gad_extraction_findings.json
+sub_extraction_findings_*.json
+app.py
+dfxfile.py
+extract_jobcard.py
+gad_baffle_pipeline.py
