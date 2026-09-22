@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Drawing Validator</title>
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Drawing Validator</h1>
+    <p class="subtitle">Checks whether sub-drawings are consistent with their main assembly drawing (GAD).</p>
+
+    <div class="project-bar">
+      <label for="project-select">Active project</label>
+      <select id="project-select"><option value="">Loading projects...</option></select>
+      <button type="button" id="new-project-btn">+ New project</button>
+      <span id="project-bar-msg" class="project-bar-msg"></span>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="upload">Upload</button>
+      <button type="button" class="tab-btn" data-tab="run">Run comparison</button>
+      <button type="button" class="tab-btn" data-tab="browse">Browse projects</button>
+    </div>
+
+    <section id="tab-upload" class="tab-panel active">
+      <p class="upload-target">Uploading to: <strong id="upload-target-name">Default Project</strong></p>
+
+      <div class="upload-cards">
+        <div class="upload-card" data-drawing-type="0" data-multi="false">
+          <div class="upload-card-title">Main Drawing </div>
+          <p class="upload-card-desc">The main assembly drawing (GAD) sub-drawings are checked against. Selecting a file extracts it immediately.</p>
+          <input type="file" class="upload-file-input" accept="application/pdf" />
+          <div class="upload-file-list"></div>
+        </div>
+
+        <div class="upload-card" data-drawing-type="1" data-multi="true">
+          <div class="upload-card-title">Sub Drawing(s) </div>
+          <p class="upload-card-desc">One or more component drawings to compare against the GAD. Add as many as you like, each extracts on its own.</p>
+          <input type="file" class="upload-file-input" accept="application/pdf" multiple />
+          <div class="upload-file-list"></div>
+        </div>
+
+        <div class="upload-card" data-drawing-type="2" data-multi="false">
+          <div class="upload-card-title">Job Card </div>
+          <p class="upload-card-desc">Shop-floor work order PDF. Extraction only — not compared against the GAD.</p>
+          <input type="file" class="upload-file-input" accept="application/pdf" />
+          <div class="upload-file-list"></div>
+        </div>
+
+        <div class="upload-card" data-drawing-type="3" data-multi="true">
+          <div class="upload-card-title">DXF File(s) </div>
+          <p class="upload-card-desc">Baffle cutting DXF sheet, and/or a GAD DXF (a file with "GAD" in its name). Cutting sheets are split into sub-parts now; GAD DXFs are just checked. Validation happens later, on the Run Comparison tab.</p>
+          <input type="file" class="upload-file-input" accept=".dxf" multiple />
+          <div class="upload-file-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-run" class="tab-panel">
+      <div class="run-dashboard">
+        <div class="run-card">
+          <h3>1. Compare GAD vs Sub Drawings</h3>
+          <p class="upload-card-desc">Cross-checks the extracted GAD against the extracted sub-drawing(s). Needs both to have been extracted on the Upload tab.</p>
+          <div class="run-card-actions">
+            <button type="button" id="run-compare-btn" disabled>Compare</button>
+            <button type="button" id="run-compare-view-btn" class="view-btn" disabled>View files</button>
+          </div>
+          <div id="run-compare-status" class="status-line hidden"></div>
+          <div id="run-compare-result" class="run-result"></div>
+        </div>
+
+        <div class="run-card">
+          <h3>2. Job Card</h3>
+          <p class="upload-card-desc">Shows the job card extraction result from the Upload tab. "Compare with sub drawing" checks the job card against an uploaded heating element sub-drawing.</p>
+          <div class="run-card-actions">
+            <button type="button" id="run-jobcard-btn" disabled>Show job card</button>
+            <button type="button" id="run-jobcard-compare-btn" disabled>Compare</button>
+            <button type="button" id="run-jobcard-view-btn" class="view-btn" disabled>View files</button>
+          </div>
+          <div id="run-jobcard-compare-status" class="status-line hidden"></div>
+          <div id="run-jobcard-compare-result" class="run-result"></div>
+          <div id="run-jobcard-result" class="run-result"></div>
+        </div>
+
+        <div class="run-card">
+          <h3>3. Validate DXF</h3>
+          <p class="upload-card-desc">Traces each split sub-part and overlays the segmental baffles on the full baffle.</p>
+          <div class="run-card-actions">
+            <button type="button" id="run-dxf-btn" disabled>Validate</button>
+            <button type="button" id="run-dxf-view-btn" class="view-btn" disabled>View files</button>
+          </div>
+          <div id="run-dxf-status" class="status-line hidden"></div>
+          <div id="run-dxf-result" class="run-result"></div>
+        </div>
+
+        <div class="run-card">
+          <h3>4. GAD vs DXF Validation</h3>
+          <p class="upload-card-desc">Finds the slotted capsule holes in the GAD DXF and traces them against the baffle in the cutting-sheet DXF. Needs a GAD DXF (name contains "GAD") and another DXF, both uploaded on the Upload tab.</p>
+          <div class="run-card-actions">
+            <button type="button" id="run-gaddxf-btn" disabled>Compare</button>
+            <button type="button" id="run-gaddxf-view-btn" class="view-btn" disabled>View files</button>
+          </div>
+          <div id="run-gaddxf-status" class="status-line hidden"></div>
+          <div id="run-gaddxf-result" class="run-result run-result-flush"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-browse" class="tab-panel">
+      <div class="browse-layout browse-layout-2col">
+        <div class="browse-col browse-drawings">
+          <h2>Drawings <span id="browse-project-name" class="browse-project-name"></span></h2>
+          <div id="drawing-list" class="list-box">Select a project above.</div>
+        </div>
+
+        <div class="browse-col browse-detail">
+          <h2>Details</h2>
+          <div id="drawing-detail" class="detail-box">Select a drawing.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="view-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="view-modal-title">Files</h3>
+        <button type="button" id="view-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div id="view-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="image-lightbox-overlay" class="lightbox-overlay hidden">
+    <button type="button" id="image-lightbox-close" class="lightbox-close">&times;</button>
+    <div id="image-lightbox-caption" class="lightbox-caption"></div>
+    <div class="lightbox-stage">
+      <img id="image-lightbox-img" alt="" />
+    </div>
+    <div class="lightbox-hint">Scroll or double-click to zoom &middot; drag to pan &middot; Esc to close</div>
+  </div>
+
+  <script src="/static/js/project-bar.js"></script>
+  <script src="/static/js/render-helpers.js"></script>
+  <script src="/static/js/image-lightbox.js"></script>
+  <script src="/static/js/view-modal.js"></script>
+  <script src="/static/js/upload.js"></script>
+  <script src="/static/js/run-comparison.js"></script>
+  <script src="/static/js/browse.js"></script>
+</body>
+</html>

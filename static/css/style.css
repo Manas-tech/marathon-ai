@@ -1,0 +1,1008 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #0e1117;
+  color: #e5e7eb;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: #9ca3af;
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 0.5rem;
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #e5e7eb;
+}
+
+button {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  background: #ff4b4b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hidden { display: none; }
+
+.status-line {
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.error-box {
+  background: #3a1a1a;
+  border: 1px solid #b3261e;
+  color: #ffb4ac;
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  margin-top: 1rem;
+}
+
+.usage-box {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.status-consistent { background: #1e7e34; color: #fff; }
+.status-discrepancies_found { background: #b3261e; color: #fff; }
+.status-could_not_match { background: #a15c00; color: #fff; }
+
+.part-file, .bom-line {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.compare-table th {
+  text-align: left;
+  padding: 8px 12px;
+  background: #111827;
+  color: #e5e7eb;
+  border-bottom: 1px solid #333;
+}
+
+.compare-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.compare-table tr.row-mismatch td { background: #4a1f21; }
+.compare-table tr.row-match td { background: #1c3a24; }
+.compare-table tr.row-info td { background: #4a3a15; }
+.compare-table tr.row-mismatch.row-accepted td { background: #33291a; }
+
+.compare-table .accept-cell { text-align: center; }
+.compare-table .mismatch-accept-checkbox { width: 16px; height: 16px; cursor: pointer; }
+
+.downloads {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.downloads a {
+  color: #ff4b4b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.downloads a:hover { text-decoration: underline; }
+
+/* Project bar */
+
+.project-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.project-bar label {
+  margin-bottom: 0;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.project-bar select {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.45rem 0.6rem;
+  background: #111827;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #e5e7eb;
+}
+
+.project-bar button {
+  margin-top: 0;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.project-bar-msg {
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+.upload-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.upload-card {
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.upload-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-card-desc {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  margin: 0 0 0.6rem;
+}
+
+.req-tag, .opt-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 1px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.req-tag { background: #4a1f21; color: #ff8a80; }
+.opt-tag { background: #1c3a24; color: #8ce0a0; }
+
+.upload-file-list {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #111827;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.upload-row-name {
+  flex: 1;
+  color: #e5e7eb;
+  word-break: break-all;
+}
+
+.upload-row-status {
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+.upload-row-pending { color: #f0ad4e; }
+.upload-row-done { color: #8ce0a0; }
+.upload-row-failed { color: #ffb4ac; }
+
+.upload-row-remove {
+  margin-top: 0;
+  padding: 0 0.5rem;
+  line-height: 1.6;
+  background: transparent;
+  color: #9ca3af;
+  border: 1px solid #333;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.upload-row-remove:hover:not(:disabled) {
+  color: #ffb4ac;
+  border-color: #b3261e;
+}
+
+@media (max-width: 700px) {
+  .upload-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.upload-target {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin: 0.3rem 0 0.6rem;
+}
+
+.upload-target strong { color: #e5e7eb; }
+
+.browse-project-name {
+  color: #ff4b4b;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+
+/* Two panes: a fixed-ish drawings list and a Details pane that takes all the
+   remaining width. Two classes so this beats the base .browse-layout rule
+   further down (which used to win and left Details with ~a quarter of the
+   width). */
+.browse-layout.browse-layout-2col {
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+/* While the Browse tab is open the page uses the full window width. */
+body.browse-active .container {
+  max-width: none;
+}
+
+/* Tabs */
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #333;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  margin-top: 0;
+  background: transparent;
+  color: #9ca3af;
+  border-radius: 6px 6px 0 0;
+  padding: 0.6rem 1.2rem;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+  color: #e5e7eb;
+  border-bottom: 2px solid #ff4b4b;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Browse projects */
+
+.browse-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.browse-col h2 {
+  font-size: 1rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+}
+
+.list-box, .detail-box {
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.detail-box { padding: 1rem; }
+
+/* Each pane fills the layout's height (set from the viewport by
+   sizeBrowseLayout() in browse.js) and scrolls inside itself. */
+.browse-layout .browse-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.browse-layout .list-box,
+.browse-layout .detail-box {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4150 transparent;
+}
+
+.browse-layout .detail-box {
+  padding: 1.2rem 1.5rem;
+}
+
+.list-item {
+  padding: 0.6rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 0.3rem;
+}
+
+.list-item:hover { background: #22262f; }
+
+.list-item.selected {
+  background: #2a1414;
+  border: 1px solid #b3261e;
+}
+
+.list-item-title {
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.list-item-sub {
+  color: #9ca3af;
+  font-size: 0.78rem;
+  margin-top: 0.1rem;
+}
+
+.drawing-type-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.3rem;
+}
+
+.drawing-type-gad { background: #1e40af; color: #fff; }
+.drawing-type-sub { background: #374151; color: #e5e7eb; }
+.drawing-type-job_card { background: #6d28d9; color: #fff; }
+.drawing-type-dxf { background: #b45309; color: #fff; }
+
+.dxf-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.dxf-gallery-item {
+  background: #111827;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.7rem;
+}
+
+.dxf-gallery-label {
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.dxf-gallery-item img {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: #fff;
+  display: block;
+  cursor: zoom-in;
+  transition: opacity 0.15s;
+}
+
+.dxf-gallery-item img:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 720px) {
+  .dxf-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Image lightbox (click-to-zoom for overlay/result images) */
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem 1.5rem;
+  z-index: 200;
+}
+
+.lightbox-overlay.hidden {
+  display: none;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 1.2rem;
+  background: transparent;
+  border: none;
+  color: #e5e7eb;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+
+.lightbox-close:hover {
+  color: #ffb4ac;
+}
+
+.lightbox-caption {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin-bottom: 0.7rem;
+  text-align: center;
+}
+
+.lightbox-stage {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-stage img {
+  max-width: 92vw;
+  max-height: 78vh;
+  background: #fff;
+  border-radius: 4px;
+  cursor: zoom-in;
+  touch-action: none;
+  user-select: none;
+}
+
+.lightbox-stage img.zoomed {
+  cursor: grab;
+}
+
+.lightbox-stage img.dragging {
+  cursor: grabbing;
+}
+
+.lightbox-hint {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.7rem;
+}
+
+.detail-header h3 {
+  margin: 0.2rem 0 0.2rem;
+  color: #e5e7eb;
+}
+
+.detail-box h4 {
+  margin-top: 1.4rem;
+  margin-bottom: 0.6rem;
+  color: #e5e7eb;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.3rem;
+}
+
+.detail-box h5 {
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.detail-table th {
+  text-align: left;
+  padding: 6px 10px;
+  background: #111827;
+  color: #e5e7eb;
+  border-bottom: 1px solid #333;
+}
+
+.detail-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: #e5e7eb;
+}
+
+.detail-table td.kcell {
+  color: #9ca3af;
+  width: 30%;
+  white-space: nowrap;
+}
+
+.notes-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+}
+
+.kv-line {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.empty-note {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.compared-files {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: #111827;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+}
+
+.compared-file-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.compared-vs {
+  color: #9ca3af;
+  font-style: italic;
+  margin: 0 0.2rem;
+}
+
+@media (max-width: 900px) {
+  .browse-layout,
+  .browse-layout.browse-layout-2col {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stacked on small screens: no fixed height, each pane just caps itself. */
+  .browse-layout .list-box,
+  .browse-layout .detail-box {
+    flex: none;
+    max-height: 70vh;
+  }
+}
+
+.summary-line {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Run Comparison dashboard */
+
+.run-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.run-card {
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.run-card h3 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+/* Results scroll inside their own box instead of stretching the page, so
+   the next card stays reachable however long a report is. Sticky table
+   headers keep column names visible while scrolling; the table keeps a
+   minimum width and scrolls sideways on narrow screens. */
+.run-result {
+  margin-top: 1rem;
+  scroll-margin-top: 1rem;
+}
+
+.run-result:empty {
+  margin-top: 0;
+}
+
+.run-result:not(:empty) {
+  max-height: 65vh;
+  overflow: auto;
+  padding: 0.9rem 1rem;
+  background: #14171d;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4150 transparent;
+  animation: run-result-in 0.25s ease-out;
+}
+
+.run-result .compare-table {
+  min-width: 560px;
+}
+
+.run-result .compare-table th {
+  position: sticky;
+  top: -0.9rem; /* cancels the container's top padding so the header sits flush */
+  z-index: 1;
+}
+
+.run-result .compare-part:first-of-type {
+  margin-top: 0.6rem;
+}
+
+.run-result .error-box {
+  margin-top: 0;
+}
+
+.compare-part {
+  margin-top: 1.2rem;
+}
+
+@keyframes run-result-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Loading state for the Compare / Validate status lines. */
+.run-card .status-line:not(.hidden) {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.run-card .status-line:not(.hidden)::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border: 2px solid #3a4150;
+  border-top-color: #ff4b4b;
+  border-radius: 50%;
+  animation: run-spin 0.8s linear infinite;
+}
+
+@keyframes run-spin {
+  to { transform: rotate(360deg); }
+}
+
+.run-card-actions button:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run-result:not(:empty),
+  .run-card .status-line:not(.hidden)::before {
+    animation: none;
+  }
+}
+
+.run-card-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.view-btn {
+  margin-top: 0.5rem;
+  background: transparent;
+  color: #e5e7eb;
+  border: 1px solid #333;
+}
+
+.view-btn:hover:not(:disabled) {
+  border-color: #ff4b4b;
+}
+
+/* View modal */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 100;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #14171d;
+  border: 1px solid #333;
+  border-radius: 10px;
+  width: min(900px, 100%);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #333;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.modal-close {
+  margin-top: 0;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0.2rem 0.5rem;
+}
+
+.modal-close:hover {
+  color: #ffb4ac;
+}
+
+.modal-body {
+  padding: 1.2rem;
+  overflow-y: auto;
+}
+
+.view-accordion-item {
+  background: #1a1d23;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 0.7rem;
+  overflow: hidden;
+}
+
+.view-accordion-item summary {
+  cursor: pointer;
+  padding: 0.7rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.view-accordion-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.view-accordion-item summary::before {
+  content: "▸";
+  color: #9ca3af;
+  font-size: 0.75rem;
+  transition: transform 0.15s ease;
+}
+
+.view-accordion-item[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.view-accordion-title {
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.view-accordion-body {
+  padding: 0 0.9rem 0.9rem;
+  border-top: 1px solid #333;
+  padding-top: 0.8rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+/* GAD vs DXF validation result (Run Comparison card 4, Browse, View modal) */
+
+/* The layout below scrolls its own match table, so this result box doesn't
+   also cap its height (avoids scroll-inside-scroll). */
+.run-result.run-result-flush:not(:empty) {
+  max-height: none;
+  overflow: visible;
+}
+
+.gaddxf-embedded {
+  margin-top: 0.8rem;
+}
+
+.gaddxf-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.gaddxf-image {
+  position: sticky;
+  top: 0.5rem;
+}
+
+.gaddxf-image-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-height: 2rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.gaddxf-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  background: #1e2228;
+  transition: opacity 0.2s ease;
+}
+
+.gaddxf-image img.loading { opacity: 0.35; }
+
+.gaddxf-clear-btn,
+.gaddxf-hl-btn {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  background: transparent;
+  color: #e5e7eb;
+  border: 1px solid #3a4150;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.gaddxf-clear-btn:hover,
+.gaddxf-hl-btn:hover:not(:disabled) { background: #22262f; }
+
+.gaddxf-hl-btn:disabled { opacity: 0.6; cursor: progress; }
+
+.gaddxf-error {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  color: #ffb4ac;
+  background: #3a1a1a;
+  border: 1px solid #b3261e;
+  border-radius: 6px;
+}
+
+.gaddxf-matches {
+  max-height: 70vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4150 transparent;
+}
+
+
+.gaddxf-matches .compare-table { min-width: 0; margin-bottom: 0; }
+.gaddxf-matches .compare-table th { top: 0; }
+
+.gaddxf-root tr.row-selected td { outline: 1px solid #facc15; outline-offset: -1px; }
+
+@media (max-width: 900px) {
+  .gaddxf-layout { grid-template-columns: 1fr; }
+  .gaddxf-image { position: static; }
+  .gaddxf-matches { max-height: 50vh; }
+}
+
+.gaddxf-clear-btn,
+.gaddxf-hl-btn { margin-top: 0; }
+
+/* The View-files modal is narrow: stack image above table there. (The
+   Browse detail pane is wide now, so it keeps the side-by-side layout.) */
+.modal-body .gaddxf-layout { grid-template-columns: 1fr; }
+.modal-body .gaddxf-image { position: static; }
+.modal-body .gaddxf-matches { max-height: 50vh; }
+
+/* Compact match table so the Highlight column fits without sideways scroll. */
+.gaddxf-matches .compare-table { font-size: 0.82rem; }
+.gaddxf-matches .compare-table th,
+.gaddxf-matches .compare-table td { padding: 6px 7px; }
+.gaddxf-matches .compare-table th { white-space: nowrap; }

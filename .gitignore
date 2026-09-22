@@ -30,3 +30,27 @@ _rendered/
 
 # Alembic (keep versions/ tracked, ignore nothing extra here -- listed
 # explicitly so nobody accidentally ignores migration files)
+
+# Sample/test drawing files (large binaries used for local testing, not
+# app source -- the app reads these via upload, it doesn't ship with them)
+Drawing-docs-*/
+*.dxf
+*.DXF
+*.dwg
+*.DWG
+
+# One-off outputs from running the standalone scripts (app.py, dfxfile.py,
+# gad_baffle_pipeline.py, extract_jobcard.py) directly against sample data
+final_report.json
+final_report.md
+gad_extraction_findings.json
+sub_extraction_findings_*.json
+
+# Ad-hoc screenshots dropped in the repo root while debugging
+image.png
+*.png
+
+# Loose sample PDFs dropped at the repo root for ad-hoc testing (repo-root
+# only -- doesn't touch anything nested under app/ or static/)
+/2193*.PDF
+/2193*.pdf
