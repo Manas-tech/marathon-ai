@@ -33,6 +33,16 @@ from matplotlib.lines import Line2D
 LABEL_TYPES = {"INSERT", "TEXT", "MTEXT"}
 CLUSTER_THRESHOLD = 20.0
 
+# A CIRCLE/ARC's axis-aligned bbox corner sticks out ~0.41x its radius past
+# the actual curve. For small holes that's negligible, but a big "outer
+# boundary" circle/arc (radius tens of units) can bbox-overlap an unrelated
+# nearby part's boundary shape at a corner even though the curves themselves
+# never come close. Only entities with a bbox diagonal above this are
+# treated as "large" and clustered by true curve-to-curve distance instead
+# of the (lenient, bbox-based) default -- small dense hole clusters keep
+# using the lenient bbox test, which is what correctly merges them.
+LARGE_ROUND_BBOX_DIAG = 50.0
+
 TARGETS = {
     "full": "FULL_BAFFLE",
     "seg_a": "SEGMENTAL_BAFFLE_A",
@@ -110,7 +120,27 @@ def _min_point_distance(pa: "np.ndarray", pb: "np.ndarray") -> float:
     return float(np.sqrt((diff ** 2).sum(axis=2)).min())
 
 
-def _cluster_entities(entities, entity_points, threshold):
+def _expand(box, margin):
+    return (
+        box.extmin.x - margin,
+        box.extmin.y - margin,
+        box.extmax.x + margin,
+        box.extmax.y + margin,
+    )
+
+
+def _boxes_overlap(a, b):
+    return not (a[2] < b[0] or b[2] < a[0] or a[3] < b[1] or b[3] < a[1])
+
+
+def _is_large_round(entity, box) -> bool:
+    if entity.dxftype() not in ("CIRCLE", "ARC"):
+        return False
+    diag = ((box.extmax.x - box.extmin.x) ** 2 + (box.extmax.y - box.extmin.y) ** 2) ** 0.5
+    return diag > LARGE_ROUND_BBOX_DIAG
+
+
+def _cluster_entities(entities, entity_boxes, entity_points, threshold):
     n = len(entities)
     parent = list(range(n))
 
@@ -125,9 +155,16 @@ def _cluster_entities(entities, entity_points, threshold):
         if rx != ry:
             parent[rx] = ry
 
+    is_large_round = [_is_large_round(e, b) for e, b in zip(entities, entity_boxes)]
+    expanded = [_expand(b, threshold / 2) for b in entity_boxes]
+
     for i in range(n):
         for j in range(i + 1, n):
-            if _min_point_distance(entity_points[i], entity_points[j]) <= threshold:
+            if is_large_round[i] or is_large_round[j]:
+                close = _min_point_distance(entity_points[i], entity_points[j]) <= threshold
+            else:
+                close = _boxes_overlap(expanded[i], expanded[j])
+            if close:
                 union(i, j)
 
     groups: dict[int, list[int]] = {}
@@ -155,7 +192,7 @@ def _split_dxf(input_path: Path, outdir: Path, threshold: float) -> list[Path]:
 
     geometry_boxes = [bbox.extents([e], fast=True) for e in geometry]
     geometry_points = [_entity_sample_points(e) for e in geometry]
-    clusters = _cluster_entities(geometry, geometry_points, threshold)
+    clusters = _cluster_entities(geometry, geometry_boxes, geometry_points, threshold)
 
     centroids = [_cluster_bbox_centroid(idxs, geometry_boxes) for idxs in clusters]
     label_boxes = {}
