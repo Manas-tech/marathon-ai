@@ -912,16 +912,23 @@ body.browse-active .container {
   margin-top: 0.8rem;
 }
 
+/* Fixed shared height for both panes (--gaddxf-pane-height) so the image
+   and the match table always end at the same boundary, regardless of the
+   image's own aspect ratio or the table's row count. */
 .gaddxf-layout {
+  --gaddxf-pane-height: 70vh;
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .gaddxf-image {
   position: sticky;
   top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: var(--gaddxf-pane-height);
 }
 
 .gaddxf-image-bar {
@@ -933,21 +940,34 @@ body.browse-active .container {
   margin-bottom: 0.4rem;
   font-size: 0.85rem;
   color: #9ca3af;
+  flex: 0 0 auto;
+}
+
+.gaddxf-image-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  background: #1e2228;
 }
 
 .gaddxf-image img {
   display: block;
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
-  border: 1px solid #2a2f3a;
-  border-radius: 8px;
-  background: #1e2228;
+  object-fit: contain;
+  cursor: zoom-in;
   transition: opacity 0.2s ease;
 }
 
 .gaddxf-image img.loading { opacity: 0.35; }
 
-.gaddxf-clear-btn,
 .gaddxf-hl-btn {
   padding: 0.2rem 0.6rem;
   font-size: 0.8rem;
@@ -958,10 +978,17 @@ body.browse-active .container {
   cursor: pointer;
 }
 
-.gaddxf-clear-btn:hover,
 .gaddxf-hl-btn:hover:not(:disabled) { background: #22262f; }
 
 .gaddxf-hl-btn:disabled { opacity: 0.6; cursor: progress; }
+
+.gaddxf-hl-btn-active {
+  background: #3a3418;
+  border-color: #facc15;
+  color: #facc15;
+}
+
+.gaddxf-hl-btn-active:hover:not(:disabled) { background: #453d1c; }
 
 .gaddxf-error {
   margin-top: 0.5rem;
@@ -974,7 +1001,7 @@ body.browse-active .container {
 }
 
 .gaddxf-matches {
-  max-height: 70vh;
+  max-height: var(--gaddxf-pane-height, 70vh);
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: #3a4150 transparent;
@@ -988,17 +1015,17 @@ body.browse-active .container {
 
 @media (max-width: 900px) {
   .gaddxf-layout { grid-template-columns: 1fr; }
-  .gaddxf-image { position: static; }
+  .gaddxf-image { position: static; height: 50vh; }
   .gaddxf-matches { max-height: 50vh; }
 }
 
-.gaddxf-clear-btn,
 .gaddxf-hl-btn { margin-top: 0; }
 
-/* The View-files modal is narrow: stack image above table there. (The
-   Browse detail pane is wide now, so it keeps the side-by-side layout.) */
+/* The View-files modal is narrow: stack image above table there, both
+   capped to the same 50vh so they still match. (The Browse detail pane is
+   wide now, so it keeps the side-by-side layout.) */
 .modal-body .gaddxf-layout { grid-template-columns: 1fr; }
-.modal-body .gaddxf-image { position: static; }
+.modal-body .gaddxf-image { position: static; height: 50vh; }
 .modal-body .gaddxf-matches { max-height: 50vh; }
 
 /* Compact match table so the Highlight column fits without sideways scroll. */

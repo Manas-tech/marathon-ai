@@ -199,7 +199,7 @@ function renderGadDxfValidation(containerEl, run) {
         `<td>#${m.capsule_index}</td><td>${esc(m.status)}</td>` +
         `<td>${fmtNum(m.capsule_radius)}</td><td>${fmtNum(m.hole_radius)}</td><td>${fmtNum(m.center_offset)}</td>` +
         `<td class="accept-cell">${acceptCell}</td>` +
-        `<td><button type="button" class="gaddxf-hl-btn" data-index="${m.capsule_index}">Highlight</button></td></tr>`
+        `<td><button type="button" class="gaddxf-hl-btn" data-index="${m.capsule_index}" data-state="highlight">Highlight</button></td></tr>`
       );
     })
     .join("");
@@ -209,9 +209,11 @@ function renderGadDxfValidation(containerEl, run) {
       `<div class="summary-line">GAD DXF: ${esc(run.gad_file)} <span class="compared-vs">vs</span> Cutting DXF: ${esc(run.cutting_file)}</div>` +
       `<div class="gaddxf-layout">` +
         `<div class="gaddxf-image">` +
-          `<div class="gaddxf-image-bar"><span data-role="caption">Overlay: GAD capsules (red) on baffle holes (blue)</span>` +
-            `<button type="button" class="gaddxf-clear-btn hidden" data-role="clear">Clear highlight</button></div>` +
-          `<a data-role="link" href="${run.overlay_url}" target="_blank"><img data-role="img" src="${run.overlay_url}" alt="GAD vs baffle overlay" /></a>` +
+          `<div class="gaddxf-image-bar"><span data-role="caption">Overlay: GAD capsules (red) on baffle holes (blue)</span></div>` +
+          `<div class="gaddxf-image-stage">` +
+            `<img data-role="img" src="${run.overlay_url}" alt="GAD vs baffle overlay" ` +
+              `data-lightbox-src="${run.overlay_url}" data-lightbox-label="GAD vs baffle overlay" />` +
+          `</div>` +
           `<div class="gaddxf-error hidden" data-role="error"></div>` +
         `</div>` +
         `<div class="gaddxf-matches">` +
@@ -225,16 +227,22 @@ function renderGadDxfValidation(containerEl, run) {
 
   const root = containerEl.querySelector(".gaddxf-root");
   const $ = (role) => root.querySelector(`[data-role="${role}"]`);
-  const img = $("img"), link = $("link"), caption = $("caption"), clearBtn = $("clear"), errBox = $("error");
+  const img = $("img"), caption = $("caption"), errBox = $("error");
   const defaultCaption = caption.textContent;
+
+  function setButtonState(btn, active) {
+    btn.dataset.state = active ? "active" : "highlight";
+    btn.textContent = active ? "Clear" : "Highlight";
+    btn.classList.toggle("gaddxf-hl-btn-active", active);
+  }
 
   function showImage(url, text, selectedIndex) {
     img.classList.add("loading");
     img.onload = img.onerror = () => img.classList.remove("loading");
     img.src = url;
-    link.href = url;
+    img.dataset.lightboxSrc = url;
+    img.dataset.lightboxLabel = text;
     caption.textContent = text;
-    clearBtn.classList.toggle("hidden", selectedIndex == null);
     root.querySelectorAll("tr.row-selected").forEach((tr) => tr.classList.remove("row-selected"));
     if (selectedIndex != null) root.querySelector(`tr[data-index="${selectedIndex}"]`)?.classList.add("row-selected");
   }
@@ -244,25 +252,35 @@ function renderGadDxfValidation(containerEl, run) {
     if (!btn) return;
     const index = btn.dataset.index;
     errBox.classList.add("hidden");
+
+    // Clicking the currently-active row's own button clears it -- no
+    // separate "Clear highlight" button needed.
+    if (btn.dataset.state === "active") {
+      showImage(run.overlay_url, defaultCaption, null);
+      setButtonState(btn, false);
+      return;
+    }
+
+    // Only one highlight is shown at a time -- reset any other row's button.
+    root.querySelectorAll('.gaddxf-hl-btn[data-state="active"]').forEach((b) => setButtonState(b, false));
+
     btn.disabled = true;
-    const label = btn.textContent;
     btn.textContent = "Rendering...";
     try {
       const res = await fetch(`/api/v1/dxf/gad-validate/${run.id}/highlight/${index}`);
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.detail || `Could not render highlight (HTTP ${res.status})`);
       showImage(body.image_url, `Highlighting capsule #${index}`, index);
+      setButtonState(btn, true);
       img.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } catch (err) {
       errBox.textContent = err.message;
       errBox.classList.remove("hidden");
+      setButtonState(btn, false);
     } finally {
       btn.disabled = false;
-      btn.textContent = label;
     }
   });
-
-  clearBtn.addEventListener("click", () => showImage(run.overlay_url, defaultCaption, null));
 }
 
 // Appends a heading plus one rendered validation run per entry to parentEl

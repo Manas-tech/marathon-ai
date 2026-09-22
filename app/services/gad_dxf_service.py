@@ -73,6 +73,13 @@ BAFFLE_EXCLUDE_TYPES = {           # entity types that are never geometry we wan
     "TEXT", "MTEXT", "INSERT", "ATTRIB", "ATTDEF", "DIMENSION", "LEADER", "MULTILEADER", "HATCH",
 }
 
+HIGHLIGHT_FILL_ALPHA = 0.15        # (0-1) opacity of the soft yellow glow behind a selected
+                                    # capsule/hole match -- lower = more of the geometry underneath
+                                    # shows through. Was 0.30.
+HIGHLIGHT_RING_ALPHA = 0.75        # (0-1) opacity of the yellow outline ring around the same
+                                    # match -- kept higher than the fill so the marker is still
+                                    # easy to spot. Was 0.9.
+
 
 # ============================================================================
 # ARGUMENT HANDLING - derive the job prefix, output folder and every
@@ -1031,10 +1038,14 @@ def trace_and_diff_dxfs(gad_path, baffle_path, out_png, out_json, highlight_caps
                 hl_center = (cap_c[0] + (hole_c[0] - cap_c[0]) * t,
                              cap_c[1] + (hole_c[1] - cap_c[1]) * t)
 
+        # Fill alpha kept low so the capsule/hole geometry underneath stays
+        # readable; the outline ring stays near-opaque so the marker itself
+        # is still easy to spot. Adjust HIGHLIGHT_FILL_ALPHA /
+        # HIGHLIGHT_RING_ALPHA below to change this.
         ax.add_patch(Circle(hl_center, hl_radius, facecolor="yellow", edgecolor="none",
-                             alpha=0.30, zorder=20))
+                             alpha=HIGHLIGHT_FILL_ALPHA, zorder=20))
         ax.add_patch(Circle(hl_center, hl_radius, fill=False, edgecolor="yellow",
-                             linewidth=2.0, alpha=0.9, zorder=21))
+                             linewidth=2.0, alpha=HIGHLIGHT_RING_ALPHA, zorder=21))
         legend_handles.append(Line2D([0], [0], color="yellow", lw=2,
                                       label=f"selected: capsule #{highlight_capsule_index}"))
 
