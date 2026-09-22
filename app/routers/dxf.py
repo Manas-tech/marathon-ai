@@ -34,7 +34,7 @@ from app.schemas.job import (
     MismatchAcceptanceUpdate,
 )
 from app.schemas.project import DxfOutputItem
-from app.services import persistence_service
+from app.services import persistence_service, storage_service
 from app.services.dxf_service import run_dxf_validate
 from app.services.gad_dxf_service import classify_match, is_gad_dxf_name, render_highlight, run_gad_dxf_validation
 
@@ -80,13 +80,20 @@ def validate_dxf(drawing_id: int, db: Session = Depends(get_db)) -> list[DxfOutp
             db.delete(row)
     db.commit()
 
-    overlays_rel = [
-        (label, png_path.relative_to(settings.upload_dir_path).as_posix())
-        for label, png_path in result.overlays
-    ]
-    persistence_service.save_dxf_outputs(db, drawing.project_id, drawing.id, overlays_rel)
+    # Store each overlay in Supabase Storage when configured (survives a
+    # host with no persistent disk); fall back to the local relative path
+    # otherwise, resolved the same way on every read via resolve_image_url.
+    overlays_stored = []
+    for label, png_path in result.overlays:
+        rel = png_path.relative_to(settings.upload_dir_path).as_posix()
+        uploaded_url = storage_service.upload_png(png_path, rel)
+        overlays_stored.append((label, uploaded_url or rel))
+    persistence_service.save_dxf_outputs(db, drawing.project_id, drawing.id, overlays_stored)
 
-    return [DxfOutputItem(label=label, image_url=f"/uploads/{rel}") for label, rel in overlays_rel]
+    return [
+        DxfOutputItem(label=label, image_url=storage_service.resolve_image_url(stored))
+        for label, stored in overlays_stored
+    ]
 
 
 # ---------- GAD DXF vs cutting-sheet DXF validation ----------
@@ -147,10 +154,16 @@ def gad_dxf_validate(payload: GadDxfValidateRequest, db: Session = Depends(get_d
         shutil.rmtree(outdir, ignore_errors=True)
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, str(exc)) from exc
 
-    overlay_rel = Path(result.paths["trace_diff_png"]).relative_to(settings.upload_dir_path).as_posix()
+    overlay_png_path = Path(result.paths["trace_diff_png"])
+    overlay_rel = overlay_png_path.relative_to(settings.upload_dir_path).as_posix()
     outdir_rel = outdir.relative_to(settings.upload_dir_path).as_posix()
+    # Only the overlay PNG goes to Supabase Storage -- outdir itself (the
+    # run's geometry/json files) stays local, so a per-capsule highlight
+    # requested after a restart still needs a fresh Compare run to work.
+    overlay_uploaded_url = storage_service.upload_png(overlay_png_path, overlay_rel)
     run, _ = persistence_service.save_gad_dxf_validation(
-        db, payload.project_id, gad.id, cutting.id, outdir_rel, overlay_rel, result.merged, classify_match
+        db, payload.project_id, gad.id, cutting.id, outdir_rel, overlay_uploaded_url or overlay_rel,
+        result.merged, classify_match,
     )
     db.commit()
     for d in old_dirs:
@@ -184,13 +197,17 @@ def highlight_gad_dxf_match(run_id: int, capsule_index: int, db: Session = Depen
 
     outdir = settings.upload_dir_path / run.output_dir
     out_png = outdir / f"highlight_{capsule_index}.png"
+    rel = out_png.relative_to(settings.upload_dir_path).as_posix()
     if not out_png.exists():
         try:
             render_highlight(outdir, capsule_index, out_png)
         except Exception as exc:  # noqa: BLE001
             logger.exception("GAD DXF highlight render failed")
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, f"Could not render highlight: {exc}") from exc
-    return GadDxfHighlightResponse(image_url=f"/uploads/{out_png.relative_to(settings.upload_dir_path).as_posix()}")
+        uploaded_url = storage_service.upload_png(out_png, rel)
+        if uploaded_url:
+            return GadDxfHighlightResponse(image_url=uploaded_url)
+    return GadDxfHighlightResponse(image_url=storage_service.resolve_image_url(rel))
 
 
 @router.patch("/gad-validate/matches/{match_id}", response_model=MismatchAcceptanceResponse)

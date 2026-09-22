@@ -38,6 +38,17 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "*"
     AUTO_CREATE_TABLES: bool = True
 
+    # -- Supabase Storage (DXF overlay PNGs only) ----------------------------
+    # Optional: only the generated overlay/highlight images are uploaded here
+    # (not the uploaded PDFs/DXFs) so they survive a host with no persistent
+    # disk (e.g. Render's free tier, whose local filesystem resets on every
+    # restart/spin-down). Uses the service_role key (server-side, bypasses
+    # RLS) -- never the anon key. If left blank, the app falls back to
+    # serving overlays from local disk exactly as before.
+    SUPABASE_URL: str = ""
+    SUPABASE_SERVICE_KEY: str = ""
+    SUPABASE_STORAGE_BUCKET: str = "dxf-overlays"
+
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
 

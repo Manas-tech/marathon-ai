@@ -37,6 +37,7 @@ from app.schemas.project import (
     ProjectDetailResponse,
     ProjectListItem,
 )
+from app.services import storage_service
 from app.services.persistence_service import (
     gad_dxf_run_to_out,
     unflatten_dxf_outputs,
@@ -258,7 +259,7 @@ def get_drawing_detail(
         job_card_extraction = unflatten_jobcard_extraction(extraction_rows)
     elif extraction_rows and drawing.type == DrawingType.DXF:
         dxf_outputs = [
-            DxfOutputItem(label=o["label"], image_url=f"/uploads/{o['path']}")
+            DxfOutputItem(label=o["label"], image_url=storage_service.resolve_image_url(o["path"]))
             for o in unflatten_dxf_outputs(extraction_rows)
         ]
     elif extraction_rows:

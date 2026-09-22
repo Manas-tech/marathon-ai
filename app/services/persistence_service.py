@@ -38,6 +38,7 @@ from app.models.gad_dxf_validation import GadDxfValidationMatch, GadDxfValidatio
 from app.models.jobcard_comparison_result import JobCardComparisonResult
 from app.models.project import Project
 from app.models.project_drawing import ProjectDrawing
+from app.services import storage_service
 from app.schemas.drawing import ComparisonReport, DrawingExtraction
 from app.schemas.job import GadDxfMatchOut, GadDxfRunOut
 from app.schemas.jobcard import JobCardComparisonReport, JobCardDocumentMeta, JobCardExtraction, JobCardParameter
@@ -229,12 +230,14 @@ def save_dxf_outputs(
     """Stores the DXF pipeline's overlay PNG outputs against the DXF's own
     drawing_id, same EXTRACTION_RESULTS table as everything else (a DXF
     "extraction" is a set of generated images rather than parsed text, but
-    the (project_id, drawing_id, parameter, value) shape still fits -- value
-    holds a path relative to UPLOAD_DIR, servable via the /uploads static
-    mount, so it survives moving the upload directory between environments):
+    the (project_id, drawing_id, parameter, value) shape still fits):
 
         OVERLAY.<n>.LABEL   e.g. "SEGMENTAL_BAFFLE_A_vs_FULL_BAFFLE"
-        OVERLAY.<n>.PATH    relative path under UPLOAD_DIR
+        OVERLAY.<n>.PATH    a Supabase Storage URL when storage_service is
+                            configured, otherwise a path relative to
+                            UPLOAD_DIR servable via the /uploads static
+                            mount -- resolve either via
+                            storage_service.resolve_image_url().
     """
     rows: List[Tuple[str, str]] = []
     for i, (label, rel_path) in enumerate(overlays, start=1):
@@ -472,7 +475,7 @@ def gad_dxf_run_to_out(db: Session, run: GadDxfValidationRun) -> GadDxfRunOut:
         cutting_drawing_id=run.cutting_drawing_id,
         gad_file=gad.title if gad else "",
         cutting_file=cutting.title if cutting else "",
-        overlay_url=f"/uploads/{run.overlay_path}",
+        overlay_url=storage_service.resolve_image_url(run.overlay_path),
         outer_radius_gad=run.outer_radius_gad,
         outer_radius_baffle=run.outer_radius_baffle,
         outer_radius_diff=run.outer_radius_diff,
